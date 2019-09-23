@@ -1,14 +1,21 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const passport = require("passport");
-
-require("./Services/db/Connection");
-const router = require("./routes/user");
+const bcrypt = require("bcrypt");
 
 const app = express();
+const router = express.Router();
+const User = require("./models/user");
+
+require("./Services/db/Connection");
+require("./Services/Passport")(User, bcrypt, passport);
+require("./routes/user")(router, passport, bcrypt);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 router.get("/", (req, res) => {
   res.json({
